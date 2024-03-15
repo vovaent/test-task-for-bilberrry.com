@@ -1,0 +1,10 @@
+.idea
+.env
+src/node_modules/
+src/vendor/
+src/wp-core/
+src/plugins/*
+!src/plugins/ttb-mega-menu/
+!src/plugins/ttb-gf-test-product-field/
+!src/plugins/ttb-cpt-job/
+!src/plugins/.editorconfig
