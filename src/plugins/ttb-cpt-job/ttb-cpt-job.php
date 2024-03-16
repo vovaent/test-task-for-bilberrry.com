@@ -16,6 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	return;
 }
 
+const TTB_CPT_SLUG = 'job';
+
 /**
  * Register CPT Job.
  *
@@ -26,7 +28,7 @@ function ttb_register_cpt_job(): void {
 		'label'  => 'Jobs',
 		'public' => true,
 	);
-	register_post_type( 'job', $args );
+	register_post_type( TTB_CPT_SLUG, $args );
 }
 
 add_action( 'init', 'ttb_register_cpt_job' );
@@ -36,28 +38,62 @@ add_action( 'init', 'ttb_register_cpt_job' );
  *
  * @return array
  */
-function ttb_get_sorted_jobs(): array {
+function ttb_get_jobs_sorted_and_alphabetized(): array {
 	global $wpdb;
 
-	$jobs        = array();
-	$sorted_jobs = array();
+	$result = array();
 
-	$query = $wpdb->prepare( "SELECT ID, post_title FROM $wpdb->posts WHERE post_type=%s AND post_status=%s ORDER BY post_title", 'job', 'publish' );
+	$jobs = get_transient( 'jobs_sorted_and_alphabetized' );
 
-	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.NotPrepared
-	$jobs = $wpdb->get_results( $query, 'ARRAY_A' );
+	if ( false === $jobs ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$jobs = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT ID, post_title FROM $wpdb->posts
+                      	WHERE post_type = %s AND post_status = %s
+                      	ORDER BY post_title",
+				TTB_CPT_SLUG,
+				'publish'
+			),
+			'ARRAY_A'
+		);
+
+		set_transient(
+			'jobs_sorted_and_alphabetized',
+			$jobs,
+			DAY_IN_SECONDS
+		);
+	}
 
 	foreach ( $jobs as $job ) {
-		if ( ! function_exists( 'get_field' ) ) {
-			break;
-		}
-
-		$custom_url = get_field( 'custom_url', $job['ID'] );
+		$custom_url = get_post_meta( (int) $job['ID'], 'custom_url', true );
 
 		$letter = $job['post_title'][0];
 
-		$sorted_jobs[ $letter ][0][ $job['post_title'] ] = $custom_url;
+		$result[ $letter ][0][ $job['post_title'] ] = $custom_url;
 	}
 
-	return $sorted_jobs;
+	return $result;
 }
+
+/**
+ * Removes cached jobs while saving a job
+ *
+ * @param int     $post_id Post ID.
+ * @param WP_Post $post Post object.
+ *
+ * @return void
+ */
+function ttb_remove_cached_jobs_on_update( int $post_id, WP_Post $post ): void {
+	if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+		return;
+	}
+
+	if ( 'job' !== $post->post_type ) {
+		return;
+	}
+
+	delete_transient( 'jobs_sorted_and_alphabetized' );
+}
+
+add_action( 'save_post', 'ttb_remove_cached_jobs_on_update', 10, 2 );
