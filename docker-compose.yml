@@ -31,7 +31,7 @@ services:
     volumes:
       - ./src/${WORDPRESS_CATALOG_NAME}:/var/www/html
       - ./src/plugins/ttb-mega-menu:/var/www/html/wp-content/plugins/ttb-mega-menu
-      - ./src/plugins/ttb-gf-test-product-field:/var/www/html/wp-content/plugins/ttb-gf-test-product-field
+      - ./src/plugins/ttb-gf-field-test-product:/var/www/html/wp-content/plugins/ttb-gf-field-test-product
       - ./src/plugins/ttb-cpt-job:/var/www/html/wp-content/plugins/ttb-cpt-job
 
     networks:
