@@ -33,6 +33,7 @@ services:
       - ./src/plugins/ttb-mega-menu:/var/www/html/wp-content/plugins/ttb-mega-menu
       - ./src/plugins/ttb-gf-field-test-product:/var/www/html/wp-content/plugins/ttb-gf-field-test-product
       - ./src/plugins/ttb-cpt-job:/var/www/html/wp-content/plugins/ttb-cpt-job
+      - ./src/themes/ttb-theme:/var/www/html/wp-content/themes/ttb-theme
 
     networks:
       - backend-dev
