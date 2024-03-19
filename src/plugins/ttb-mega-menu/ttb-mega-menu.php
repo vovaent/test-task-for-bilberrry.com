@@ -25,7 +25,7 @@ if ( ! class_exists( 'ACF' ) ) {
  *
  * @return void
  */
-function ttb_mm_mm_enqueue_styles(): void {
+function ttb_mm_enqueue_styles(): void {
 	// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 	wp_enqueue_style( 'bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css' );
 
@@ -49,7 +49,7 @@ function ttb_mm_mm_enqueue_styles(): void {
 	wp_add_inline_style( 'bootstrap', $inline_styles );
 }
 
-add_action( 'wp_enqueue_scripts', 'ttb_mm_mm_enqueue_styles' );
+add_action( 'wp_enqueue_scripts', 'ttb_mm_enqueue_styles' );
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/menu.php';
 require_once plugin_dir_path( __FILE__ ) . 'includes/acf.php';
